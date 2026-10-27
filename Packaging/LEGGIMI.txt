@@ -1,0 +1,25 @@
+BOREAL 0.2.5 — Mac Intel, macOS 13 o successivo
+
+Trascina Boreal in Applicazioni. Il monitoraggio non richiede il servizio.
+Per regolare le ventole, apri “Installa controllo ventole.command” in questa
+cartella. La password amministratore va inserita soltanto nel Terminale.
+Per rimuovere il servizio usa “Rimuovi controllo ventole.command”.
+
+Il menu rapido ora usa controlli nativi macOS: le righe e l’etichetta rimangono
+ferme mentre è aperto. Puoi aprirlo anche con ⌘⇧M dalla finestra di Boreal.
+I profili sono raccolti nel sottomenu Profili.
+
+I comandi manuali vengono confermati soltanto dopo la risposta del servizio.
+“Auto non verificato” indica che Boreal non può confermare lo stato SMC;
+non significa che le ventole siano necessariamente in manuale.
+Chiudere la finestra mantiene l’app attiva. Uscire richiede il ritorno Auto.
+Non eseguire insieme a un altro programma di controllo ventole.
+
+Il watchdog richiede Auto dopo 4 secondi senza rinnovo. Il tempo SMC si
+aggiunge al lease. Le protezioni non garantiscono il ripristino in caso di
+blocco kernel, guasto hardware o scrittura SMC rifiutata.
+
+Build locale con firma ad hoc, non notarizzata da Apple. Apple Silicon non
+supportato. La nuova release è collaudata in monitoraggio sul Mac corrente;
+per l’helper sono eseguiti test con SMC simulato, non nuove prove manuali.
+I sorgenti e il rapporto di verifica sono consegnati separatamente.
