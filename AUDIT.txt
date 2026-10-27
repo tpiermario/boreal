@@ -1,0 +1,144 @@
+AGGIORNAMENTO 0.2.5 — 27 ottobre 2026
+I due problemi rimasti aperti nella 0.2.4 sono corretti:
+16. Segmentazione CPU/GPU prima del raggruppamento: nessuna linea attraverso
+    buchi oltre 3 secondi, sensori mancanti o timestamp non crescenti. PointMark
+    mantiene visibili i tratti isolati. 14 nuovi casi Swift verificano i dati.
+17. Timeout distinti: APPLY 5,5 s, AUTO 3,5 s, PING 0,8 s. Il budget APPLY
+    comprende 2 s di riletture e due passaggi di rollback fino a 1 s ciascuno,
+    più margine IO. Non è una garanzia sui tempi del driver. Test con socket
+    locale: OK dopo 2,2 s, errore dopo 4,2 s, AUTO dopo 1,2 s, PING scaduto e
+    APPLY senza risposta entro 5,5 s. Autenticazione peer simulata soltanto
+    nell'eseguibile di test; il client di produzione richiede sempre UID 0.
+    Il controllo scadenza lease a 4 s è coperto da test di confine e non è
+    stato esteso. PING non rinnova il lease. Nessuna prova hardware di crash
+    o sospensione è implicita nei test simulati.
+Esito: 156 verifiche Swift/AppKit, suite C helper/trasporto e temporizzazione
+passate. Build release Intel riuscita. Nessun servizio installato o aggiornato
+sul Mac durante queste correzioni. I sorgenti restano conservati localmente.
+
+Segue il rapporto storico della 0.2.4; le due voci allora aperte sono ora chiuse.
+
+BOREAL 0.2.4 — RICOSTRUZIONE, CORREZIONI E VERIFICHE
+27 ottobre 2026 — macOS 26.6.2 Intel, Swift 6.3.3, deployment macOS 13
+
+ESITO E LIMITI DELLA RICHIESTA
+La ricerca NON ha dimostrato 100 ulteriori bug distinti. Non vengono trasformati
+casi di test, varianti dello stesso difetto o ipotesi in bug per raggiungere 100.
+Sono raccolte 15 correzioni di comportamento/UI/UX, incluso il menu segnalato,
+e 2 ulteriori problemi individuati nel codice che restano aperti sotto.
+142 verifiche Swift/AppKit passate, più suite C helper simulato e trasporto.
+Il log TEST-RESULTS.txt riporta tutti i casi, senza chiamarli bug.
+
+PROVENIENZA
+I sorgenti sono ricostruiti dalle copie testuali e dalle modifiche conservate
+nella cronologia di questa stessa chat. I frammenti sono stati ricomposti,
+compilati e verificati. Non si afferma equivalenza binaria con la 0.2.3.
+Errori introdotti durante la ricomposizione e corretti prima del rilascio
+non sono contati come vecchi bug: per esempio una dichiarazione duplicata e
+l'inizializzazione del menu prima della prima apertura.
+
+CORREZIONI DISTINTE
+01. Menu rapido instabile durante aggiornamenti delle letture.
+    Evidenza: segnalazione e screenshot dell'utente; TrayView osservava l'intero
+    AppModel aggiornato ogni secondo, dentro MenuBarExtra.
+    Correzione: NSMenu nativo; righe, identità degli elementi ed etichetta della
+    barra congelate durante tracking. Aggiornamento dopo chiusura/riapertura.
+    Verifica: test di identità, titoli e larghezza invariati mentre cambiano
+    telemetria e profili. La causa specifica del rendering SwiftUI non è stata
+    isolata dentro il framework Apple; la nuova implementazione lo elimina
+    dal percorso del menu.
+02. Possibilità di aprire più finestre principali con stato di navigazione
+    condiviso: WindowGroup permetteva finestre duplicate dello stesso modello.
+    Correzione: una scena Window; riapertura della finestra esistente.
+03. Comandi presentati come applicati prima della risposta e editor chiuso
+    prima dell'esito. restore() impostava Automatico subito; apply() attivava
+    il profilo e restituiva true prima del risultato asincrono.
+    Correzione: stato pendente, conferma solo su OK, editor aperto su errore.
+    Anche il testo senza servizio non afferma un Auto mai verificato.
+04. Letture vecchie presentate nella barra come correnti se non arrivano più
+    campioni. Prima trayText ignorava lastUpdated.
+    Correzione: indicazione Dati non aggiornati dopo tre secondi, controlli
+    manuali e stato telemetria coerenti; test dati assenti, scaduti e futuri.
+05. GPU a 95 °C accettata dalla validazione UI ma rifiutata dall'helper.
+    Correzione: la UI verifica anche la GPU prima della richiesta manuale.
+    Verifica: caso GPU95, oltre al caso CPU95 e ai test termici del servizio.
+06. Valore sensore 125 °C ammesso dal reader ma rifiutato dalla regola sensore.
+    Correzione: confine superiore coerente. Le protezioni CPU/GPU a 95 °C
+    restano operative; test 125 e 126. Non è una nuova soglia di sicurezza.
+07. Preferenze corrotte sovrascritte dal successivo salvataggio.
+    Correzione: copia con nome univoco prima di salvare; salvataggio bloccato
+    se non è possibile conservare l'originale. Test con file corrotto reale.
+08. Modifiche ai profili presentate come riuscite dopo errore di scrittura.
+    Prima creazione, eliminazione e importazione cambiavano la lista e persist()
+    non restituiva l'esito. Correzione: esito esplicito, rollback della lista,
+    nome della bozza conservato. Un solo difetto di transazione, non tre bug.
+    Verifica: percorso non scrivibile simulato con un file al posto della cartella.
+09. Importazione di nomi profilo duplicati, anche all'interno dello stesso JSON,
+    mentre il salvataggio ordinario li vietava.
+    Correzione: validazione dell'intero lotto prima di mutare lo stato; confronto
+    senza distinzione di maiuscole/accenti. Test duplicati interni/esistenti.
+10. Nomi lunghi troncati silenziosamente a 60 caratteri durante il salvataggio.
+    Correzione: rifiuto esplicito, conservando il testo da correggere.
+    Verifica: nome di 61 caratteri non salvato né troncato.
+11. Fino a 100 profili aggiunti direttamente al menu principale, rendendo
+    scomodo raggiungere i comandi successivi.
+    Correzione UX: sottomenu Profili; verifica struttura nativa e aggiornamento
+    soltanto alla riapertura. Non contato come crash o errore hardware.
+12. Richieste obsolete ancora inviate dalla coda: il controllo della generazione
+    riguardava soltanto il callback, dopo l'invio al servizio.
+    Correzione: epoch sincronizzato verificato prima dell'invio. Un callback
+    vecchio non può cancellare lo stato pendente di una richiesta più recente.
+    Verifica: test epoch corrente/obsoleto e revisione della guardia nel worker.
+13. Messaggio di errore nell'editor rimasto visibile dopo aver corretto la regola.
+    Correzione: azzeramento di applyError al cambiamento dei parametri; i nuovi
+    problemi di validazione restano mostrati. Evidenza statica nel vecchio editor.
+14. Picker sensore senza voce corrispondente se il sensore selezionato sparisce
+    mentre l'editor è aperto. Il fallback precedente eseguiva solo onAppear.
+    Correzione: voce Non disponibile e validazione che impedisce l'applicazione.
+15. Esportazione CSV da menu/tastiera disponibile senza campioni, a differenza
+    del pulsante nella pagina Cronologia.
+    Correzione UX: disponibilità coerente anche per il comando di menu.
+
+ALTRE MODIFICHE, NON CONTATE COME BUG CONFERMATI
+- Sintassi numerica del protocollo ristretta a decimali: rifiuta esadecimali e
+  notazione esponenziale che strtod accettava. Coperto da test C.
+- Richiesta immediata AUTO dopo APPLY non confermato, oltre al watchdog.
+- Evento di uscita hover laterale non azzera la voce appena entrata.
+- Stato lungo nelle schede ventole va a capo nella finestra piccola.
+- Comando Apri menu rapido da tastiera (Cmd-Shift-M).
+- Script riproducibili di build e packaging, template Finder conservato.
+
+ULTERIORI PROBLEMI INDIVIDUATI, ANCORA APERTI
+16. Il grafico può collegare con una linea campioni separati da un'interruzione
+    della telemetria. ThermalChart raggruppa per CPU/GPU senza segmentare i buchi.
+    Non è una misura reale durante l'intervallo mancante; il CSV mantiene i veri
+    timestamp. Serve una segmentazione del grafico con test dei buchi temporali.
+17. Il timeout client di 0,8 s non scala con il numero di ventole. L'helper può
+    usare fino a 100 ms per la modalità e 100 ms per il target di ciascuna ventola:
+    con molti dispositivi/lente risposte il client può segnalare un errore prima
+    della fine di un comando. Non riprodotto sull'hardware corrente; discrepanza
+    temporale dimostrabile dai limiti dei due percorsi. Non è stato aumentato
+    il timeout senza un collaudo dedicato del lease/watchdog.
+
+COLLAUDO EFFETTIVO
+- Build release Intel riuscita; firma ad hoc e Info.plist verificati.
+- 142 casi Swift/AppKit con runner incluso, zero fallimenti.
+- Test C: preflight RPM, soglie termiche, sensori non validi, Auto, rollback
+  dopo errore SMC simulato, sintassi comandi, argomenti null e framing socket.
+- App avviata sul Mac corrente in monitoraggio, senza installare il servizio.
+- Sei schermate osservate in modalità scura con finestra ridotta a circa
+  900 punti di larghezza; navigazione laterale cliccabile anche sul margine.
+- Panoramica e Impostazioni osservate anche in chiaro. Tema finale: Sistema.
+- Menu rapido aperto nella build finale con Cmd-Shift-M: righe allineate;
+  letture del menu ferme mentre i dati della finestra continuano ad aggiornarsi.
+- DMG ULMO verificato con hdiutil; firma di app, helper e CLI verificata
+  dentro il volume montato; volume smontato a fine collaudo.
+- CLI in sola lettura: entrambe le ventole con mode=0 (Auto).
+- Non eseguite in questo turno nuove scritture manuali alle ventole, prove
+  sleep/wake hardware o prove di crash. Nessuna certificazione per altri Mac.
+
+CONSERVAZIONE
+Cartella Boreal-sorgenti e archivio ZIP separato dal DMG. La cartella conserva
+anche la cronologia Git locale della ricostruzione e delle correzioni.
+Nessuna modifica al repository GitHub viene inclusa automaticamente in questo
+rilascio locale. Non eliminare i sorgenti per ridurre il peso del DMG.

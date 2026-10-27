@@ -1,0 +1,161 @@
+Helper regression: thermal protection, preflight, auto, rollback and malformed commands passed.
+Transport: malformed frames, null arguments and response initialization passed.
+Transport timing: delayed apply, rollback, auto, bounded timeout and fast ping passed.
+PASS	grafico vuoto
+PASS	grafico continuo due serie
+PASS	grafico interruzione temporale
+PASS	grafico singolo punto visibile
+PASS	grafico assenza GPU interrompe solo GPU
+PASS	grafico sensori invalidi
+PASS	grafico filtro data
+PASS	grafico Fahrenheit
+PASS	grafico orologio arretra
+PASS	grafico timestamp duplicato
+PASS	grafico riduzione conserva interruzione
+PASS	grafico riduzione numero punti
+PASS	grafico soglia tre secondi
+PASS	grafico oltre soglia
+PASS	auto senza sensori
+PASS	auto con limiti NaN
+PASS	regola rifiuta minimo negativo
+PASS	regola rifiuta limiti invertiti
+PASS	regola rifiuta limiti uguali
+PASS	regola rifiuta massimo eccessivo
+PASS	regola rifiuta minimo NaN
+PASS	regola rifiuta massimo infinito
+PASS	RPM sotto minimo
+PASS	RPM minimo
+PASS	RPM intermedio
+PASS	RPM massimo
+PASS	RPM sopra massimo
+PASS	RPM NaN
+PASS	RPM infinito
+PASS	RPM meno infinito
+PASS	sensore zero
+PASS	sensore negativo
+PASS	sensore NaN
+PASS	sensore infinito
+PASS	sensore freddo
+PASS	sensore inizio
+PASS	sensore mezzo
+PASS	sensore massimo
+PASS	sensore 125
+PASS	sensore oltre125
+PASS	sensore mancante
+PASS	curva interpolata
+PASS	curva satura in basso
+PASS	curva satura in alto
+PASS	soglie invertite
+PASS	soglie uguali
+PASS	soglie inizio basso
+PASS	soglie massimo alto
+PASS	soglie NaN
+PASS	soglie infinito
+PASS	soglie estremi
+PASS	chiave "TC0P"
+PASS	chiave "FS! "
+PASS	chiave ""
+PASS	chiave "TC0"
+PASS	chiave "TC0PP"
+PASS	chiave "TC\nP"
+PASS	chiave "TC\0P"
+PASS	chiave "T€"
+PASS	chiave "😀"
+PASS	chiave "éabc"
+PASS	profilo valido
+PASS	profilo vuoto
+PASS	nome ""
+PASS	nome "   "
+PASS	nome "A\nB"
+PASS	nome "A\tB"
+PASS	nome "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+PASS	nome "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+PASS	nome "Lavoro 😀"
+PASS	trim nome
+PASS	indice ventola -1
+PASS	indice ventola 10
+PASS	10 ventole valide
+PASS	11 ventole rifiutate
+PASS	profilo RPM -1.0
+PASS	profilo RPM 20001.0
+PASS	profilo RPM inf
+PASS	profilo RPM nan
+PASS	preferenze predefinite
+PASS	versione 0
+PASS	versione 2
+PASS	versione -1
+PASS	tema system
+PASS	tema light
+PASS	tema dark
+PASS	tema invalido
+PASS	menu ventola -1
+PASS	menu ventola 10
+PASS	sensore menu invalido
+PASS	UUID duplicato
+PASS	limite101
+PASS	limite100
+PASS	JSON roundtrip
+PASS	JSON incompleto {}
+PASS	JSON incompleto []
+PASS	JSON incompleto null
+PASS	JSON incompleto {
+PASS	JSON incompleto {"version":2}
+PASS	import duplicato esistente
+PASS	import duplicato interno
+PASS	import case insensitive
+PASS	import diacritici
+PASS	import nuovo UUID
+PASS	import vuoto
+PASS	import oltre100
+PASS	import atomico invalido
+PASS	CSV ""
+PASS	CSV "test"
+PASS	CSV "a,b"
+PASS	CSV "a\"b"
+PASS	CSV "a\nb"
+PASS	CSV "😀"
+PASS	epoch iniziale
+PASS	epoch scarta vecchia richiesta
+PASS	epoch accetta corrente
+PASS	avvio non dichiara Auto
+PASS	avvio telemetria non valida
+PASS	tray senza dati esplicito
+PASS	avvio controlli manuali disabilitati
+PASS	apply senza ventole rifiutato
+PASS	Auto demo confermato
+PASS	telemetria recente
+PASS	telemetria scaduta
+PASS	telemetria futura
+PASS	manuale disponibile demo
+PASS	comando pendente blocca manuale
+PASS	conflitto blocca manuale
+PASS	conflitto blocca Auto
+PASS	CPU95 blocca
+PASS	GPU95 blocca
+PASS	profilo salvato su disco
+PASS	nome conservato
+PASS	duplicato salvataggio rifiutato
+PASS	nome lungo non troncato
+PASS	preferenze persistenti
+PASS	backup corruzione
+PASS	originale non sovrascritto al caricamento
+PASS	persistenza dopo backup
+PASS	errore disco segnalato
+PASS	rollback creazione profilo
+PASS	rollback eliminazione
+PASS	lettura oltre1MB rifiutata
+PASS	lettura1MB
+PASS	menu non vuoto prima apertura
+PASS	menu tracking
+PASS	righe immutate durante lettura
+PASS	identità righe immutata
+PASS	larghezza barra immutata durante menu
+PASS	nessuna custom view nelle righe
+PASS	titoli informativi disabilitati
+PASS	azioni hanno target
+PASS	profili in sottomenu
+PASS	tracking termina
+PASS	etichetta aggiornata dopo chiusura
+PASS	profili rimossi alla riapertura
+RESULT	156 passed	0 failed
+Build complete! (13.86s)

@@ -1,41 +1,95 @@
-# Boreal
+# Boreal 0.2.5
 
 Temperature e ventole del Mac, in una finestra semplice.
+App nativa per Mac Intel con macOS 13 o successivo. Interfaccia in italiano,
+tema chiaro e scuro, sensori, profili, cronologia ed esportazione CSV.
+Il monitoraggio funziona senza installare un servizio.
 
-Boreal permette di tenere d’occhio i sensori del Mac, vedere come cambiano le temperature e regolare le ventole quando serve. L’interfaccia è in italiano, con modalità chiara e scura.
+[Scarica Boreal per Mac Intel](https://github.com/tpiermario/boreal/releases/latest)
 
-**[Scarica Boreal per Mac Intel](https://github.com/tpiermario/boreal/releases/latest)**
+Il codice di questa versione è pubblico con licenza MIT.
 
-## Cosa puoi fare
+Questa cartella conserva i sorgenti ricostruiti dai frammenti di codice e dalle
+modifiche presenti nella cronologia del progetto. Non è una decompilazione né
+una copia byte per byte del vecchio archivio cancellato. Include l’app, il
+backend C/IOKit, il servizio, la CLI, i test e gli script di distribuzione.
 
-- Consultare temperature e velocità delle ventole in tempo reale.
-- Scegliere il sensore da mostrare nella barra dei menu.
-- Usare la gestione automatica Apple, impostare RPM fissi o una curva legata a un sensore.
-- Salvare profili e consultare la cronologia della sessione.
-- Esportare la telemetria in CSV e i profili in JSON.
+## Compilare e verificare
 
-## Installazione
+Su un Mac Intel con Xcode Command Line Tools installati:
 
-1. Scarica il file `Boreal-0.2.3-Intel.dmg` dalla pagina della release.
-2. Apri il DMG e trascina **Boreal** in **Applicazioni**.
-3. Apri Boreal: il monitoraggio funziona anche senza installare il servizio.
+```sh
+bash scripts/test.sh
+bash scripts/build.sh
+bash scripts/package.sh
+```
 
-Per regolare le ventole, apri la cartella **Opzioni** nel DMG ed esegui **Installa controllo ventole.command**. Il Terminale chiederà la password amministratore per installare il servizio locale.
+Il pacchetto finale viene creato in `dist/Boreal-0.2.5-Intel.dmg`. Per indicare
+un’altra destinazione, passala come primo argomento a `package.sh`.
+La build esegue i test prima di compilare la release. Non installa il servizio.
+Non scarica dipendenze di rete. Il runner di verifica Swift usa Foundation e
+AppKit: funziona anche con i soli Command Line Tools e non richiede XCTest.
+I precedenti test XCTest dei modelli sono conservati in `Tests/BorealTests`;
+`swift test` richiede un ambiente che fornisca il modulo XCTest.
 
-La build è firmata localmente e non è notarizzata da Apple: macOS può impedirne l’apertura con le impostazioni predefinite.
+La build usa una firma ad hoc locale. Non è notarizzata da Apple. `Resources`
+contiene l’icona; `Packaging/layout.dmg` contiene soltanto lo sfondo, il layout
+Finder e il collegamento Applicazioni, senza applicazione compilata.
 
-## Compatibilità e controllo delle ventole
+## Cosa cambia nella 0.2.5
 
-Boreal 0.2.3 è destinato ai **Mac Intel con macOS 13 o successivo**. Apple Silicon non è supportato. I sensori disponibili e la possibilità di controllare le ventole dipendono dal modello; il collaudo svolto non copre tutti i Mac Intel.
+Il grafico lascia uno spazio quando mancano letture per più di tre secondi o
+quando un sensore scompare. CPU e GPU sono segmentate separatamente, prima di
+ridurre i campioni; anche un tratto composto da un solo punto resta visibile.
 
-Il pulsante **Ripristina Auto** restituisce il controllo ad Apple. Chiudere la finestra lascia Boreal attivo nella barra dei menu; uscire dall’app richiede il ritorno ad Auto. Il servizio dispone di un watchdog che richiede il ripristino automatico dopo quattro secondi senza rinnovo del controllo. Non usare Boreal insieme a un altro programma che regola le ventole.
+Il client attende fino a 5,5 secondi per APPLY e 3,5 per AUTO, includendo le
+attese di verifica e ripristino dell’helper con dieci ventole. PING mantiene
+0,8 secondi. Questi timeout non rinnovano né allungano il lease del watchdog.
+Le chiamate al driver e il carico del sistema non hanno una durata garantita:
+il timeout resta finito e un errore continua a richiedere il ritorno ad Auto.
 
-Per rimuovere il servizio, esegui **Rimuovi controllo ventole.command** dalla cartella **Opzioni**. Poi esci dall’app e rimuovila da Applicazioni.
+## Correzioni della 0.2.4
 
-## Cosa contiene questo repository
+Il menu della barra è un `NSMenu` nativo. Le sue voci sono una fotografia dello
+stato all’apertura: non cambiano posizione durante gli aggiornamenti dei
+sensori. La telemetria continua a essere letta; il testo del menu si aggiorna
+alla successiva apertura. Scorciatoia dalla finestra: ⌘⇧M.
 
-Questa pagina raccoglie il download, le istruzioni e le segnalazioni di Boreal. **Il codice sorgente non è incluso**: il progetto viene pubblicato qui come applicazione compilata, non come repository di sviluppo open source. La licenza MIT inclusa nel pacchetto è riportata anche nel file [LICENSE](LICENSE).
+La UI distingue comandi in attesa, confermati e non verificati. L’editor resta
+aperto se il servizio rifiuta la richiesta. I profili vengono salvati in modo
+atomico: un errore di scrittura non viene presentato come un salvataggio
+riuscito. Le impostazioni illeggibili vengono copiate prima di un nuovo
+salvataggio. L’importazione rifiuta nomi duplicati e file oltre 1 MB.
 
-## Segnalare un problema
+## Installazione e uso
 
-Apri una [segnalazione](https://github.com/tpiermario/boreal/issues) indicando il modello del Mac, la versione di macOS, cosa stavi facendo e cosa è successo. Uno screenshot può aiutare, purché non contenga informazioni personali. Non inserire password o numeri di serie.
+Trascina Boreal dal DMG in Applicazioni. Per il controllo manuale usa lo script
+nella cartella Opzioni del DMG; per l’helper compilato localmente:
+
+```sh
+bash scripts/install-helper.sh
+bash scripts/uninstall-helper.sh
+```
+
+Gli script chiedono la password amministratore nel Terminale. Il servizio è
+riservato all’UID che lo installa; non applica un profilo manuale all’avvio.
+Per la simulazione, senza comandi alle ventole:
+
+```sh
+dist/Boreal.app/Contents/MacOS/Boreal --demo
+```
+
+Impostazioni: `~/Library/Application Support/Boreal/preferences.json`.
+La simulazione usa una cartella separata, `Boreal-Demo`.
+Il servizio accetta PING, AUTO e APPLY. PING non rinnova il lease di quattro
+secondi. Il watchdog e la protezione termica restano nel servizio.
+
+## Limiti verificati
+
+Il rapporto `AUDIT.txt` distingue difetti, verifiche e limiti del collaudo.
+Non sono certificati Apple Silicon, altri modelli Intel, sospensione hardware,
+crash del kernel o guasti SMC. I test del servizio usano un backend simulato.
+Non avviare contemporaneamente altri controller ventole.
+
+Licenza MIT, vedi `LICENSE`. Conserva questa cartella e l’archivio sorgenti:
+sono necessari per riprodurre e mantenere la build.
