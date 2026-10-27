@@ -4,7 +4,7 @@ Temperature e ventole del Mac, in una finestra semplice.
 
 Boreal permette di tenere d’occhio i sensori del Mac, vedere come cambiano le temperature e regolare le ventole quando serve. L’interfaccia è in italiano, con modalità chiara e scura.
 
-**[Scarica Boreal per Mac Intel](https://github.com/pie1100/boreal/releases/latest)**
+**[Scarica Boreal per Mac Intel](https://github.com/tpiermario/boreal/releases/latest)**
 
 ## Cosa puoi fare
 
@@ -38,4 +38,4 @@ Questa pagina raccoglie il download, le istruzioni e le segnalazioni di Boreal. 
 
 ## Segnalare un problema
 
-Apri una [segnalazione](https://github.com/pie1100/boreal/issues) indicando il modello del Mac, la versione di macOS, cosa stavi facendo e cosa è successo. Uno screenshot può aiutare, purché non contenga informazioni personali. Non inserire password o numeri di serie.
+Apri una [segnalazione](https://github.com/tpiermario/boreal/issues) indicando il modello del Mac, la versione di macOS, cosa stavi facendo e cosa è successo. Uno screenshot può aiutare, purché non contenga informazioni personali. Non inserire password o numeri di serie.
